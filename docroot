@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# docroot: Find the document root for domains on a CWP server
+# Nathan P. <me@tchbnl.net>
+# 0.1a
+set -euo pipefail
+
+# Version information
+VERSION='0.1a'
+
+# Nice text formatting options
+TEXT_BOLD='\e[1m'
+TEXT_UNSET='\e[0m'
+
+# Help message
+show_help() {
+    cat << EOF
+$(echo -e "${TEXT_BOLD}")docroot:$(echo -e "${TEXT_UNSET}") Find the document root for domains on a CWP server
+
+USAGE: docroot DOMAIN
+    --help -h           Show this message
+    --version -v        Show version information
+EOF
+}
+
+# We run our domain through all three tables to see if there's a match. If there
+# is, we're good and stop there. If not, we move on to the next one.
+find_docroot() {
+    # Primary domain
+    result="$(mysql -u root root_cwp -Nse "SELECT username FROM user WHERE domain = '${domain}';")"
+    if [[ -n "${result}" ]]; then
+        echo "/home/${result}/public_html"
+        return
+    fi
+
+    # Addon domain
+    result="$(mysql -u root root_cwp -Nse "SELECT path FROM domains WHERE domain = '${domain}';")"
+    if [[ -n "${result}" ]]; then
+        echo "${result}"
+        return
+    fi
+
+    # Subdomain
+    result="$(mysql -u root root_cwp -Nse "SELECT path FROM subdomains WHERE CONCAT(subdomain, '.', domain) = '${domain}';")"
+    if [[ -n "${result}" ]]; then
+        echo "${result}"
+        return
+    fi
+
+    # And if no results were found at all...
+    echo "${domain} wasn't found in the CWP database."
+}
+
+# Command options
+while [[ "${#}" -gt 0 ]]; do
+    case "${1}" in
+        --help | -h)
+            show_help
+            exit
+            ;;
+
+        --version | -v)
+            echo -e "${TEXT_BOLD}docroot${TEXT_UNSET} ${VERSION}"
+            exit
+            ;;
+
+        -*)
+            echo -e "Not sure what ${1} is supposed to mean..."
+            echo
+            show_help
+            exit
+            ;;
+
+        *)
+            break
+            ;;
+    esac
+done
+
+# Show help message and exit if no arguments (like a domain) were passed
+if [[ "${#}" -eq 0 ]]; then
+    show_help
+    exit
+fi
+
+# And if we have something, pass that through as our domain to find_docroot
+domain="${1}"
+find_docroot "${domain}"
