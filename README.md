@@ -27,3 +27,6 @@ Show detailed information about a CWP account
 
 ### cwplogin
 Like 'whmlogin' but for CWP (as much as possible)
+
+### whoowns
+A 'whoowns' script that works like the one from cPanel
