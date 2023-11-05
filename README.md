@@ -17,8 +17,26 @@ USAGE: docroot DOMAIN
 /home/cwpsite/testdomain.com
 [root@cwp ~]# docroot test.testdomain.com
 /home/cwpsite/test.testdomain.com
-[root@cwp ~]# docroot yourlocalbatmanguy.com
-yourlocalbatmanguy.com wasn't found in the CWP database.
+[root@cwp ~]# docroot sexylenin.com
+sexylenin.com wasn't found in the CWP database.
+```
+
+### whoowns
+A 'whoowns' script that works like the one from cPanel
+
+```
+[root@cwp ~]# whoowns
+whoowns: Find the owner of a domain on a CWP server
+
+USAGE: whoowns DOMAIN
+    --help -h           Show this message
+    --version -v        Show version information
+[root@cwp ~]# whoowns cwpsite.tchbnl.net
+cwpsite
+[root@cwp ~]# whoowns test.testdomain.com
+cwpsite
+[root@cwp ~]# whoowns sexylenin.com
+sexylenin.com wasn't found in the CWP database.
 ```
 
 ## In Development
@@ -27,6 +45,3 @@ Show detailed information about a CWP account
 
 ### cwplogin
 Like 'whmlogin' but for CWP (as much as possible)
-
-### whoowns
-A 'whoowns' script that works like the one from cPanel

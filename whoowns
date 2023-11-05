@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# docroot: Find the document root for domains on a CWP server
+# whoowns: Find the owner of a domain on a CWP server
 # Nathan P. <me@tchbnl.net>
 # 0.1a
 set -euo pipefail
@@ -14,9 +14,9 @@ TEXT_UNSET='\e[0m'
 # Help message
 show_help() {
     cat << EOF
-$(echo -e "${TEXT_BOLD}")docroot:$(echo -e "${TEXT_UNSET}") Find the document root for domains on a CWP server
+$(echo -e "${TEXT_BOLD}")whoowns:$(echo -e "${TEXT_UNSET}") Find the owner of a domain on a CWP server
 
-USAGE: docroot DOMAIN
+USAGE: whoowns DOMAIN
     --help -h           Show this message
     --version -v        Show version information
 EOF
@@ -24,23 +24,24 @@ EOF
 
 # We run our domain through all three tables to see if there's a match. If
 # there is, we're good and stop there. If not, we move on to the next one.
-find_docroot() {
+# Yes, this is almost literally the docroot script with some tweaks. Guilty.
+find_owner() {
     # Primary domain
     result="$(mysql -u root root_cwp -Nse "SELECT username FROM user WHERE domain = '${domain}';")"
     if [[ -n "${result}" ]]; then
-        echo "/home/${result}/public_html"
+        echo "${result}"
         return
     fi
 
     # Addon domain
-    result="$(mysql -u root root_cwp -Nse "SELECT path FROM domains WHERE domain = '${domain}';")"
+    result="$(mysql -u root root_cwp -Nse "SELECT user FROM domains WHERE domain = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "${result}"
         return
     fi
 
     # Subdomain
-    result="$(mysql -u root root_cwp -Nse "SELECT path FROM subdomains WHERE CONCAT(subdomain, '.', domain) = '${domain}';")"
+    result="$(mysql -u root root_cwp -Nse "SELECT user FROM subdomains WHERE CONCAT(subdomain, '.', domain) = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "${result}"
         return
@@ -59,7 +60,7 @@ while [[ "${#}" -gt 0 ]]; do
             ;;
 
         --version | -v)
-            echo -e "${TEXT_BOLD}docroot${TEXT_UNSET} ${VERSION}"
+            echo -e "${TEXT_BOLD}whoowns${TEXT_UNSET} ${VERSION}"
             exit
             ;;
 
@@ -82,6 +83,6 @@ if [[ "${#}" -eq 0 ]]; then
     exit
 fi
 
-# And if we have something, pass that through as our domain to find_docroot
+# And if we have something, pass that through as our domain to find_owner
 domain="${1}"
-find_docroot "${domain}"
+find_owner "${domain}"
