@@ -39,9 +39,29 @@ cwpsite
 sexylenin.com wasn't found in the CWP database.
 ```
 
-## In Development
 ### review
 Show detailed information about a CWP account
 
+```
+[root@cwp ~]# review
+review: Show detailed information about a CWP account
+
+USAGE: review USER
+    --help -h           Show this message
+    --version -v        Show version information
+[root@cwp ~]# review cwpsite
+🧔 Username: cwpsite
+🌎 Domain: cwpsite.tchbnl.net
+📦 Package: default
+📅 Created: 2023-10-29 06:13:23
+📧 Email: no.email@example.com
+💾 Size: 8.0M
+🌐 IP: 5.161.207.83
+📂 Doc. Root: /home/cwpsite/public_html
+[root@cwp ~]# review greg
+greg wasn't found in the CWP database.
+```
+
+## In Development
 ### cwplogin
 Like 'whmlogin' but for CWP (as much as possible)

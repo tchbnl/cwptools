@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# review: Show detailed information about a CWP account
+# Nathan P. <me@tchbnl.net>
+# 0.1a
+set -euo pipefail
+
+# Version information
+VERSION='0.1a'
+
+# Nice text formatting options
+TEXT_BOLD='\e[1m'
+TEXT_UNSET='\e[0m'
+
+# Help message
+show_help() {
+    cat << EOF
+$(echo -e "${TEXT_BOLD}")review:$(echo -e "${TEXT_UNSET}") Show detailed information about a CWP account
+
+USAGE: review USER
+    --help -h           Show this message
+    --version -v        Show version information
+EOF
+}
+
+# We do an initial check if the user was found in the CWP database. If it
+# was, we continue on and fetch the bits of info we need for each field.
+review_user() {
+    result="$(mysql -u root root_cwp -Nse "SELECT username FROM user WHERE username = '${user}';")"
+    if [[ -z "${result}" ]]; then
+        echo "${user} wasn't found in the CWP database."
+        return
+    fi
+
+    # Username (duh)
+    echo -e "🧔 ${TEXT_BOLD}Username:${TEXT_UNSET} ${user}"
+
+    # Domain
+    domain="$(mysql -u root root_cwp -Nse "SELECT domain FROM user WHERE username = '${user}';")"
+    echo -e "🌎 ${TEXT_BOLD}Domain:${TEXT_UNSET} ${domain}"
+
+    # Package
+    package_id="$(mysql -u root root_cwp -Nse "SELECT package FROM user WHERE username = '${user}';")"
+    package="$(mysql -u root root_cwp -Nse "SELECT package_name FROM packages WHERE id = '${package_id}';")"
+    echo -e "📦 ${TEXT_BOLD}Package:${TEXT_UNSET} ${package}"
+
+    # Creation date
+    date="$(mysql -u root root_cwp -Nse "SELECT setup_date FROM user WHERE username = '${user}';")"
+    echo -e "📅 ${TEXT_BOLD}Created:${TEXT_UNSET} ${date}"
+
+    # Contact email
+    email="$(mysql -u root root_cwp -Nse "SELECT email FROM user WHERE username = '${user}';")"
+    echo -e "📧 ${TEXT_BOLD}Email:${TEXT_UNSET} ${email}"
+
+    # We do a simple du of the homedir. CWP doesn't offer a better method for
+    # this and there's nothing reliable enough for other account data.
+    size="$(du -hs /home/"${user}" | awk '{print $1}')"
+    echo -e "💾 ${TEXT_BOLD}Size:${TEXT_UNSET} ${size}"
+
+    # IP address
+    ip_address="$(mysql -u root root_cwp -Nse "SELECT ip_address FROM user WHERE username = '${user}';")"
+    echo -e "🌐 ${TEXT_BOLD}IP:${TEXT_UNSET} ${ip_address}"
+
+    # The username in the database is always the Linux user, and the docroot is
+    # fixed to public_html on CWP. At least as far as CWP knows.
+    echo -e "📂 ${TEXT_BOLD}Doc. Root:${TEXT_UNSET} /home/${user}/public_html"
+}
+
+# Command options
+while [[ "${#}" -gt 0 ]]; do
+    case "${1}" in
+        --help | -h)
+            show_help
+            exit
+            ;;
+
+        --version | -v)
+            echo -e "${TEXT_BOLD}review${TEXT_UNSET} ${VERSION}"
+            exit
+            ;;
+
+        -*)
+            echo -e "Not sure what ${1} is supposed to mean..."
+            echo
+            show_help
+            exit
+            ;;
+
+        *)
+            break
+            ;;
+    esac
+done
+
+# Show help message and exit if no arguments (like a username) were passed
+if [[ "${#}" -eq 0 ]]; then
+    show_help
+    exit
+fi
+
+# And if we have something, pass that through as our user to review_user
+user="${1}"
+review_user "${user}"
