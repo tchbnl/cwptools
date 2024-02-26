@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # docroot: Find the document root for domains on a CWP server
 # Nathan P. <me@tchbnl.net>
-# 0.1a
+# 0.1b
 set -euo pipefail
 
 # Version information
-VERSION='0.1a'
+VERSION='0.1b'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
@@ -82,6 +82,15 @@ if [[ "${#}" -eq 0 ]]; then
     exit
 fi
 
-# And if we have something, pass that through as our domain to find_docroot
-domain="${1}"
+# First convert the user's input into lowercase (domains and subdomains are
+# lowercase according to Google) and capture it
+domain="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
+
+# And then check if it's valid (not strict)
+if [[ ! "${domain}" =~ ^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]+$ ]]; then
+    echo "That doesn't look like a valid domain or subdomain."
+    exit
+fi
+
+# And then pass the valid input to find_docroot if it's valid. Valid.
 find_docroot "${domain}"
