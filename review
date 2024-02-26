@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # review: Show detailed information about a CWP account
 # Nathan P. <me@tchbnl.net>
-# 0.1a
+# 0.1b
 set -euo pipefail
 
 # Version information
-VERSION='0.1a'
+VERSION='0.1b'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
@@ -97,6 +97,15 @@ if [[ "${#}" -eq 0 ]]; then
     exit
 fi
 
-# And if we have something, pass that through as our user to review_user
-user="${1}"
+# First convert the user's input into lowercase (usernames are always
+# lowercase) and capture it
+user="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
+
+# And then check if it's valid for a Linux username
+if [[ ! "${user}" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+    echo "That doesn't look like a valid username."
+    exit
+fi
+
+# And then pass the valid input to review_user if it's valid. Valid.
 review_user "${user}"
