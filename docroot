@@ -22,25 +22,32 @@ USAGE: docroot DOMAIN
 EOF
 }
 
+# Newer versions of MariaDB complain about using 'mysql'
+if command -v mariadb >/dev/null 2>&1; then
+    MYSQL_COMMAND='mariadb'
+else
+    MYSQL_COMMAND='mysql'
+fi
+
 # We run our domain through all three tables to see if there's a match. If
 # there is, we're good and stop there. If not, we move on to the next one.
 find_docroot() {
     # Primary domain
-    result="$(mysql -u root root_cwp -Nse "SELECT username FROM user WHERE domain = '${domain}';")"
+    result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT username FROM user WHERE domain = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "/home/${result}/public_html"
         return
     fi
 
     # Addon domain
-    result="$(mysql -u root root_cwp -Nse "SELECT path FROM domains WHERE domain = '${domain}';")"
+    result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT path FROM domains WHERE domain = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "${result}"
         return
     fi
 
     # Subdomain
-    result="$(mysql -u root root_cwp -Nse "SELECT path FROM subdomains WHERE CONCAT(subdomain, '.', domain) = '${domain}';")"
+    result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT path FROM subdomains WHERE CONCAT(subdomain, '.', domain) = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "${result}"
         return

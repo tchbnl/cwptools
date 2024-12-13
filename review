@@ -22,10 +22,17 @@ USAGE: review USER
 EOF
 }
 
+# Newer versions of MariaDB complain about using 'mysql'
+if command -v mariadb >/dev/null 2>&1; then
+    MYSQL_COMMAND='mariadb'
+else
+    MYSQL_COMMAND='mysql'
+fi
+
 # We do an initial check if the user was found in the CWP database. If it
 # was, we continue on and fetch the bits of info we need for each field.
 review_user() {
-    result="$(mysql -u root root_cwp -Nse "SELECT username FROM user WHERE username = '${user}';")"
+    result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT username FROM user WHERE username = '${user}';")"
     if [[ -z "${result}" ]]; then
         echo "${user} wasn't found in the CWP database."
         return
@@ -35,20 +42,20 @@ review_user() {
     echo -e "🧔 ${TEXT_BOLD}Username:${TEXT_UNSET} ${user}"
 
     # Domain
-    domain="$(mysql -u root root_cwp -Nse "SELECT domain FROM user WHERE username = '${user}';")"
+    domain="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT domain FROM user WHERE username = '${user}';")"
     echo -e "🌎 ${TEXT_BOLD}Domain:${TEXT_UNSET} ${domain}"
 
     # Package
-    package_id="$(mysql -u root root_cwp -Nse "SELECT package FROM user WHERE username = '${user}';")"
-    package="$(mysql -u root root_cwp -Nse "SELECT package_name FROM packages WHERE id = '${package_id}';")"
+    package_id="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT package FROM user WHERE username = '${user}';")"
+    package="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT package_name FROM packages WHERE id = '${package_id}';")"
     echo -e "📦 ${TEXT_BOLD}Package:${TEXT_UNSET} ${package}"
 
     # Creation date
-    date="$(mysql -u root root_cwp -Nse "SELECT setup_date FROM user WHERE username = '${user}';")"
+    date="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT setup_date FROM user WHERE username = '${user}';")"
     echo -e "📅 ${TEXT_BOLD}Created:${TEXT_UNSET} ${date}"
 
     # Contact email
-    email="$(mysql -u root root_cwp -Nse "SELECT email FROM user WHERE username = '${user}';")"
+    email="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT email FROM user WHERE username = '${user}';")"
     echo -e "📧 ${TEXT_BOLD}Email:${TEXT_UNSET} ${email}"
 
     # We do a simple du of the homedir. CWP doesn't offer a better method for
@@ -57,7 +64,7 @@ review_user() {
     echo -e "💾 ${TEXT_BOLD}Size:${TEXT_UNSET} ${size}"
 
     # IP address
-    ip_address="$(mysql -u root root_cwp -Nse "SELECT ip_address FROM user WHERE username = '${user}';")"
+    ip_address="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT ip_address FROM user WHERE username = '${user}';")"
     echo -e "🌐 ${TEXT_BOLD}IP:${TEXT_UNSET} ${ip_address}"
 
     # The username in the database is always the Linux user, and the docroot is
