@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # whoowns: Find the owner of a domain on a CWP server
 # Nathan P. <me@tchbnl.net>
-# 0.1b
+# 0.1c
 set -euo pipefail
 
 # Version information
-VERSION='0.1b'
+VERSION='0.1c'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
