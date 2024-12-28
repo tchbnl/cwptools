@@ -65,3 +65,6 @@ greg wasn't found in the CWP database.
 ## In Development
 ### cwplogin
 Like 'whmlogin' but for CWP (as much as possible)
+
+### switch
+Easy user switcher to switch into a CWP user's shell account
