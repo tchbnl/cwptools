@@ -37,25 +37,25 @@ find_owner() {
     result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT username FROM user WHERE domain = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "${result}"
-        return 1
+        return 0
     fi
 
     # Addon domain
     result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT user FROM domains WHERE domain = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "${result}"
-        return 1
+        return 0
     fi
 
     # Subdomain
     result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT user FROM subdomains WHERE CONCAT(subdomain, '.', domain) = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "${result}"
-        return 1
+        return 0
     fi
 
     # And if no results were found at all...
-    echo "${domain} wasn't found in the CWP database."
+    echo "${domain} wasn't found in the CWP database." >&2
     return 1
 }
 
@@ -73,7 +73,7 @@ while [[ "${#}" -gt 0 ]]; do
             ;;
 
         -*)
-            echo -e "Not sure what ${1} is supposed to mean..."
+            echo -e "Not sure what ${1} is supposed to mean..." >&2
             echo
             show_help
             exit 1

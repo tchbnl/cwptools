@@ -54,7 +54,7 @@ find_docroot() {
     fi
 
     # And if no results were found at all...
-    echo "${domain} wasn't found in the CWP database."
+    echo "${domain} wasn't found in the CWP database." >&2
     return 1
 }
 
@@ -72,7 +72,7 @@ while [[ "${#}" -gt 0 ]]; do
             ;;
 
         -*)
-            echo -e "Not sure what ${1} is supposed to mean..."
+            echo -e "Not sure what ${1} is supposed to mean..." >&2
             echo
             show_help
             exit 1
@@ -96,7 +96,7 @@ domain="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
 
 # And then check if it's valid (not strict)
 if [[ ! "${domain}" =~ ^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]+$ ]]; then
-    echo "That doesn't look like a valid domain or subdomain."
+    echo "That doesn't look like a valid domain or subdomain." >&2
     exit 1
 fi
 

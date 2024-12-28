@@ -34,7 +34,7 @@ fi
 review_user() {
     result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT username FROM user WHERE username = '${user}';")"
     if [[ -z "${result}" ]]; then
-        echo "${user} wasn't found in the CWP database."
+        echo "${user} wasn't found in the CWP database." >&2
         return 1
     fi
 
@@ -86,7 +86,7 @@ while [[ "${#}" -gt 0 ]]; do
             ;;
 
         -*)
-            echo -e "Not sure what ${1} is supposed to mean..."
+            echo -e "Not sure what ${1} is supposed to mean..." >&2
             echo
             show_help
             exit 1
@@ -110,7 +110,7 @@ user="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
 
 # And then check if it's valid for a Linux username
 if [[ ! "${user}" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
-    echo "That doesn't look like a valid username."
+    echo "That doesn't look like a valid username." >&2
     exit 1
 fi
 
