@@ -62,9 +62,20 @@ USAGE: review USER
 greg wasn't found in the CWP database.
 ```
 
+### switch
+Easily switch into a CWP user's shell account
+
+```
+[root@cwp ~]# switch
+switch: "Switch" into a local CWP user's shell account
+
+USAGE: switch USER
+    --help -h           Show this message
+    --version -v        Show version information
+[root@cwp ~]# switch example
+[example@cwp ~]$
+```
+
 ## In Development
 ### cwplogin
 Like 'whmlogin' but for CWP (as much as possible)
-
-### switch
-Easy user switcher to switch into a CWP user's shell account

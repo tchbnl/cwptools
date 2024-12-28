@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# switch: "Switch" into a user on a CWP server to perform local actions
+# Nathan P. <code@tchbnl.net>
+# 0.1a
+set -euo pipefail
+
+# We waste no time, if a user isn't approved to use this command, we bail
+# Update this with the actual list, or consider adding a "gregthelizard" user
+# to the server for fun admin tasks.
+# This is also all easy enough to change into a group check instead
+allowed_users=('root'
+               'gregthelizard')
+
+# We collect our current user and set is_authorized for the check ahead
+current_user="$(whoami)"
+is_authorized=0
+
+# Cycle through each user until we find an authorized match
+for user in "${allowed_users[@]}"; do
+    if [[ "${current_user}" = "${user}" ]]; then
+        is_authorized=1
+        break
+    fi
+done
+
+# And bail if we don't. The silence is intentional.
+if [[ "${is_authorized}" -ne 1 ]]; then
+    exit 1
+fi
+
+# Version information
+VERSION='0.1a'
+
+# Nice text formatting options
+TEXT_BOLD='\e[1m'
+TEXT_UNSET='\e[0m'
+
+# Help message
+show_help() {
+    cat << EOF
+$(echo -e "${TEXT_BOLD}")switch:$(echo -e "${TEXT_UNSET}") "Switch" into a local CWP user's shell account
+
+USAGE: switch USER
+    --help -h           Show this message
+    --version -v        Show version information
+EOF
+}
+
+# Newer versions of MariaDB complain about using 'mysql'
+if command -v mariadb >/dev/null 2>&1; then
+    MYSQL_COMMAND='mariadb'
+else
+    MYSQL_COMMAND='mysql'
+fi
+
+# We do an initial check if the user was found in the CWP database. If it
+# was, we continue on.
+switch_into() {
+    result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT username FROM user WHERE username = '${user}';")"
+    if [[ -z "${result}" ]]; then
+        echo "${user} wasn't found in the CWP database." >&2
+        return 1
+    fi
+
+    # CWP has a low nproc limit of 40 set for users by default, which tends to
+    # be too low to run their shell. We need to work around this. su and sudo
+    # won't work because the original user's nproc limit is replaced. So we
+    # have to reset to setpriv and some voodo.
+    user_home=$(getent passwd example | awk -F ':' '{print $6}')
+    HOME="${user_home}" setpriv --init-groups --regid="${user}" --reuid="${user}" bash -c 'cd && bash'
+}
+
+# Command options
+while [[ "${#}" -gt 0 ]]; do
+    case "${1}" in
+        --help | -h)
+            show_help
+            exit 0
+            ;;
+
+        --version | -v)
+            echo -e "${TEXT_BOLD}switch${TEXT_UNSET} ${VERSION}"
+            exit 0
+            ;;
+
+        -*)
+            echo -e "Not sure what ${1} is supposed to mean..." >&2
+            echo
+            show_help
+            exit 1
+            ;;
+
+        *)
+            break
+            ;;
+    esac
+done
+
+# Show help message and exit if no arguments (like a domain) were passed
+if [[ "${#}" -eq 0 ]]; then
+    show_help
+    exit 0
+fi
+
+# First convert the user's input into lowercase (usernames are always
+# lowercase) and capture it
+user="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
+
+# And then check if it's valid for a Linux username
+if [[ ! "${user}" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+    echo "That doesn't look like a valid username." >&2
+    exit 1
+fi
+
+# And then pass the valid input to switch_into if it's valid. Valid.
+switch_into "${user}"
