@@ -97,7 +97,7 @@ domain="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
 
 # And then check if it's valid (not strict)
 if [[ ! "${domain}" =~ ^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]+$ ]]; then
-    echo "That doesn't look like a valid domain or subdomain."
+    echo "That doesn't look like a valid domain or subdomain." >&2
     exit 1
 fi
 
