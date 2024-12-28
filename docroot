@@ -55,6 +55,7 @@ find_docroot() {
 
     # And if no results were found at all...
     echo "${domain} wasn't found in the CWP database."
+    return 1
 }
 
 # Command options
