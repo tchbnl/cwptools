@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # docroot: Find the document root for domains on a CWP server
-# Nathan P. <me@tchbnl.net>
+# Nathan P. <code@tchbnl.net>
 # 0.1c
 set -euo pipefail
 
@@ -36,21 +36,21 @@ find_docroot() {
     result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT username FROM user WHERE domain = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "/home/${result}/public_html"
-        return
+        return 0
     fi
 
     # Addon domain
     result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT path FROM domains WHERE domain = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "${result}"
-        return
+        return 0
     fi
 
     # Subdomain
     result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT path FROM subdomains WHERE CONCAT(subdomain, '.', domain) = '${domain}';")"
     if [[ -n "${result}" ]]; then
         echo "${result}"
-        return
+        return 0
     fi
 
     # And if no results were found at all...
@@ -62,19 +62,19 @@ while [[ "${#}" -gt 0 ]]; do
     case "${1}" in
         --help | -h)
             show_help
-            exit
+            exit 0
             ;;
 
         --version | -v)
             echo -e "${TEXT_BOLD}docroot${TEXT_UNSET} ${VERSION}"
-            exit
+            exit 0
             ;;
 
         -*)
             echo -e "Not sure what ${1} is supposed to mean..."
             echo
             show_help
-            exit
+            exit 1
             ;;
 
         *)
@@ -86,7 +86,7 @@ done
 # Show help message and exit if no arguments (like a domain) were passed
 if [[ "${#}" -eq 0 ]]; then
     show_help
-    exit
+    exit 0
 fi
 
 # First convert the user's input into lowercase (domains and subdomains are
@@ -96,7 +96,7 @@ domain="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
 # And then check if it's valid (not strict)
 if [[ ! "${domain}" =~ ^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]+$ ]]; then
     echo "That doesn't look like a valid domain or subdomain."
-    exit
+    exit 1
 fi
 
 # And then pass the valid input to find_docroot if it's valid. Valid.
