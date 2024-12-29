@@ -37,13 +37,13 @@ TEXT_UNSET='\e[0m'
 
 # Help message
 show_help() {
-    cat << EOF
+    cat << END_OF_HELP
 $(echo -e "${TEXT_BOLD}")switch:$(echo -e "${TEXT_UNSET}") "Switch" into a local CWP user's shell account
 
 USAGE: switch USER
     --help -h           Show this message
     --version -v        Show version information
-EOF
+END_OF_HELP
 }
 
 # Newer versions of MariaDB complain about using 'mysql'
@@ -65,7 +65,7 @@ switch_into() {
     # CWP has a low nproc limit of 40 set for users by default, which tends to
     # be too low to run their shell. We need to work around this. su and sudo
     # won't work because the original user's nproc limit is replaced. So we
-    # have to reset to setpriv and some voodo.
+    # have to resort to setpriv and some voodo.
     user_home=$(getent passwd example | awk -F ':' '{print $6}')
     HOME="${user_home}" setpriv --init-groups --regid="${user}" --reuid="${user}" bash -c 'cd && bash'
 }

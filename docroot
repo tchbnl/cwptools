@@ -13,13 +13,13 @@ TEXT_UNSET='\e[0m'
 
 # Help message
 show_help() {
-    cat << EOF
+    cat << END_OF_HELP
 $(echo -e "${TEXT_BOLD}")docroot:$(echo -e "${TEXT_UNSET}") Find the document root for domains on a CWP server
 
 USAGE: docroot DOMAIN
     --help -h           Show this message
     --version -v        Show version information
-EOF
+END_OF_HELP
 }
 
 # Newer versions of MariaDB complain about using 'mysql'

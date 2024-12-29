@@ -13,13 +13,13 @@ TEXT_UNSET='\e[0m'
 
 # Help message
 show_help() {
-    cat << EOF
+    cat << END_OF_HELP
 $(echo -e "${TEXT_BOLD}")whoowns:$(echo -e "${TEXT_UNSET}") Find the owner of a domain on a CWP server
 
 USAGE: whoowns DOMAIN
     --help -h           Show this message
     --version -v        Show version information
-EOF
+END_OF_HELP
 }
 
 # Newer versions of MariaDB complain about using 'mysql'

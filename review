@@ -13,13 +13,13 @@ TEXT_UNSET='\e[0m'
 
 # Help message
 show_help() {
-    cat << EOF
+    cat << END_OF_HELP
 $(echo -e "${TEXT_BOLD}")review:$(echo -e "${TEXT_UNSET}") Show detailed information about a CWP account
 
 USAGE: review USER
     --help -h           Show this message
     --version -v        Show version information
-EOF
+END_OF_HELP
 }
 
 # Newer versions of MariaDB complain about using 'mysql'
