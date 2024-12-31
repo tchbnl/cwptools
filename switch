@@ -1,35 +1,18 @@
 #!/usr/bin/env bash
 # switch: "Switch" into a user on a CWP server to perform local actions
 # Nathan P. <code@tchbnl.net>
-# 0.1a
+# 0.1b
 set -euo pipefail
 
-# We waste no time, if a user isn't approved to use this command, we bail
-# Update this with the actual list, or consider adding a "gregthelizard" user
-# to the server for fun admin tasks.
-# This is also all easy enough to change into a group check instead
-allowed_users=('root'
-               'gregthelizard')
-
-# We collect our current user and set is_authorized for the check ahead
+# This script is meant to be used by root or a user with sudo access to it
+# The silent exit is intentional
 current_user="$(whoami)"
-is_authorized=0
-
-# Cycle through each user until we find an authorized match
-for user in "${allowed_users[@]}"; do
-    if [[ "${current_user}" = "${user}" ]]; then
-        is_authorized=1
-        break
-    fi
-done
-
-# And bail if we don't. The silence is intentional.
-if [[ "${is_authorized}" -ne 1 ]]; then
+if [[ "${current_user}" != 'root' ]]; then
     exit 1
 fi
 
 # Version information
-VERSION='0.1a'
+VERSION='0.1b'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
