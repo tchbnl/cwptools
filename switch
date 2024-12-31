@@ -49,7 +49,7 @@ switch_into() {
     # be too low to run their shell. We need to work around this. su and sudo
     # won't work because the original user's nproc limit is replaced. So we
     # have to resort to setpriv and some voodo.
-    user_home=$(getent passwd example | awk -F ':' '{print $6}')
+    user_home=$(getent passwd "${user}" | awk -F ':' '{print $6}')
     HOME="${user_home}" setpriv --init-groups --regid="${user}" --reuid="${user}" bash -c 'cd && bash'
 }
 
