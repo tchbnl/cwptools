@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 # docroot: Find the document root for domains on a CWP server
 # Nathan P. <code@tchbnl.net>
-# 0.1c
+# 0.1d
 set -euo pipefail
 
+# This script is meant to be used by root or a user with sudo access to it
+# The silent exit is intentional
+current_user="$(whoami)"
+if [[ "${current_user}" != 'root' ]]; then
+    exit 1
+fi
+
 # Version information
-VERSION='0.1c'
+VERSION='0.1d'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
