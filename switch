@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # switch: "Switch" into a user on a CWP server to perform local actions
 # Nathan P. <code@tchbnl.net>
-# 0.1b
+# 0.1c
 set -euo pipefail
 
 # This script is meant to be used by root or a user with sudo access to it
@@ -12,7 +12,7 @@ if [[ "${current_user}" != 'root' ]]; then
 fi
 
 # Version information
-VERSION='0.1b'
+VERSION='0.1c'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
@@ -49,8 +49,10 @@ switch_into() {
     # be too low to run their shell. We need to work around this. su and sudo
     # won't work because the original user's nproc limit is replaced. So we
     # have to resort to setpriv and some voodo.
-    user_home=$(getent passwd "${user}" | awk -F ':' '{print $6}')
-    HOME="${user_home}" setpriv --init-groups --regid="${user}" --reuid="${user}" bash -c 'cd && bash'
+    user_uid="$(id -u "${user}")"
+    user_gid="$(id -u "${user}")"
+    user_home="$(getent passwd "${user}" | awk -F ':' '{print $6}')"
+    HOME="${user_home}" setpriv --clear-groups --regid="${user_gid}" --reuid="${user_uid}" bash -c 'cd && bash'
 }
 
 # Command options
