@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # switch: "Switch" into a user on a CWP server to perform local actions
 # Nathan P. <code@tchbnl.net>
-# 0.1d
+# 0.1e
 set -euo pipefail
 
 # This script is meant to be used by root or a user with sudo access to it
@@ -12,7 +12,7 @@ if [[ "${current_user}" != 'root' ]]; then
 fi
 
 # Version information
-VERSION='0.1d'
+VERSION='0.1e'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
