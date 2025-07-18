@@ -39,7 +39,7 @@ fi
 # We do an initial check if the user was found in the CWP database. If it
 # was, we continue on.
 switch_into() {
-    result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT username FROM user WHERE username = '${user}';")"
+    result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT username FROM user WHERE username = '${user//\'/\'\'}';")"
     if [[ -z "${result}" ]]; then
         echo "${user} wasn't found in the CWP database." >&2
         return 1
@@ -49,10 +49,10 @@ switch_into() {
     # be too low to run their shell. We need to work around this. su and sudo
     # won't work because the original user's nproc limit is replaced. So we
     # have to resort to setpriv and some voodo.
-    user_uid="$(id -u "${user}")"
-    user_gid="$(id -g "${user}")"
-    user_home="$(getent passwd "${user}" | awk -F ':' '{print $6}')"
-    HOME="${user_home}" setpriv --clear-groups --regid="${user_gid}" --reuid="${user_uid}" bash -c 'cd && bash'
+    user_uid="$(id -u -- "${user}")"
+    user_gid="$(id -g -- "${user}")"
+    user_home="$(getent passwd -- "${user}" | awk -F ':' '{print $6}')"
+    env -i HOME="${user_home}" USER="${user}" SHELL=/bin/bash setpriv --clear-groups --regid="${user_gid}" --reuid="${user_uid}" bash -c 'cd && bash'
 }
 
 # Command options
@@ -92,7 +92,7 @@ fi
 user="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
 
 # And then check if it's valid for a Linux username
-if [[ ! "${user}" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+if [[ ! "${user}" =~ ^[a-z][a-z0-9_-]{0,31}$ ]]; then
     echo "That doesn't look like a valid username." >&2
     exit 1
 fi
