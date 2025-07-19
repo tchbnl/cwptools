@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # switch: "Switch" into a user on a CWP server to perform local actions
 # Nathan P. <code@tchbnl.net>
-# 0.1e
+# 0.1f
 set -euo pipefail
 
 # This script is meant to be used by root or a user with sudo access to it
@@ -12,7 +12,7 @@ if [[ "${current_user}" != 'root' ]]; then
 fi
 
 # Version information
-VERSION='0.1e'
+VERSION='0.1f'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
@@ -39,7 +39,7 @@ fi
 # We do an initial check if the user was found in the CWP database. If it
 # was, we continue on.
 switch_into() {
-    result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT username FROM user WHERE username = '${user//\'/\'\'}';")"
+    result="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT username FROM user WHERE username = '${user}';")"
     if [[ -z "${result}" ]]; then
         echo "${user} wasn't found in the CWP database." >&2
         return 1
@@ -92,7 +92,7 @@ fi
 user="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
 
 # And then check if it's valid for a Linux username
-if [[ ! "${user}" =~ ^[a-z][a-z0-9_-]{0,31}$ ]]; then
+if [[ ! "${user}" =~ ^[a-z][a-z0-9_-]*[a-z0-9_]$ ]]; then
     echo "That doesn't look like a valid username." >&2
     exit 1
 fi

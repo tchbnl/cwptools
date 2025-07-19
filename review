@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # review: Show detailed information about a CWP account
 # Nathan P. <code@tchbnl.net>
-# 0.1d
+# 0.1e
 set -euo pipefail
 
 # This script is meant to be used by root or a user with sudo access to it
@@ -12,7 +12,7 @@ if [[ "${current_user}" != 'root' ]]; then
 fi
 
 # Version information
-VERSION='0.1d'
+VERSION='0.1e'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
@@ -67,8 +67,11 @@ review_user() {
 
     # We do a simple du of the homedir. CWP doesn't offer a better method for
     # this and there's nothing reliable enough for other account data.
-    size="$(du -hs /home/"${user}" | awk '{print $1}')"
-    echo -e "💾 ${TEXT_BOLD}Size:${TEXT_UNSET} ${size}"
+    if size="$(timeout 30 du -hs /home/"${user}" 2>/dev/null | awk '{print $1}')"; then
+        echo -e "💾 ${TEXT_BOLD}Home Size:${TEXT_UNSET} ${size}"
+    else
+        echo -e "💾 ${TEXT_BOLD}Home Size:${TEXT_UNSET} Too large to calculate"
+    fi
 
     # IP address
     ip_address="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT ip_address FROM user WHERE username = '${user}';")"
@@ -116,7 +119,7 @@ fi
 user="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
 
 # And then check if it's valid for a Linux username
-if [[ ! "${user}" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+if [[ ! "${user}" =~ ^[a-z][a-z0-9_-]*[a-z0-9_]$ ]]; then
     echo "That doesn't look like a valid username." >&2
     exit 1
 fi

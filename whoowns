@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # whoowns: Find the owner of a domain on a CWP server
 # Nathan P. <code@tchbnl.net>
-# 0.1d
+# 0.1e
 set -euo pipefail
 
 # This script is meant to be used by root or a user with sudo access to it
@@ -12,7 +12,7 @@ if [[ "${current_user}" != 'root' ]]; then
 fi
 
 # Version information
-VERSION='0.1d'
+VERSION='0.1e'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
@@ -103,7 +103,7 @@ fi
 domain="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
 
 # And then check if it's valid (not strict)
-if [[ ! "${domain}" =~ ^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]+$ ]]; then
+if [[ ! "${domain}" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]+$ ]]; then
     echo "That doesn't look like a valid domain or subdomain." >&2
     exit 1
 fi
