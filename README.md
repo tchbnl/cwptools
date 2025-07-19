@@ -76,13 +76,20 @@ USAGE: switch USER
 [example@cwp ~]$
 ```
 
-## In Development
 ### cwplogin
-Like 'whmlogin' but for CWP (as much as possible). Haven't forgotten about this one. Basic idea right now is:
+Like 'whmlogin' but for CWP (as much as possible).
 
-1. Copy the current shadow line for root
-2. Update the root password
-3. Show the new root password with a link to the CWP admin
-4. Hit enter (or Ctrl+C or w/e) to restore the original shadow line
+```
+[root@cwp ~]# cwplogin --help
+cwplogin: Like "whmlogin" but for CWP
 
-CWP doesn't have an API to create a root login session like cPanel does :(
+USAGE: cwplogin
+    --help -h           Show this message
+    --version -v        Show version information
+[root@cwp ~]# cwplogin
+URL: https://cwp.example.com:2087
+Username: root
+Password: gd+1VgjR+ILDs6NcBtS7
+
+Hit ENTER to restore original password and exit (or wait 5 minutes):
+```

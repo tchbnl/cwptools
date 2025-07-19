@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+# cwplogin: Like "whmlogin" but for CWP
+# Nathan P. <code@tchbnl.net>
+# 0.1a
+set -euo pipefail
+
+# This script is meant to be used by root or a user with sudo access to it
+# The silent exit is intentional
+current_user="$(whoami)"
+if [[ "${current_user}" != 'root' ]]; then
+    exit 1
+fi
+
+# Version information
+VERSION='0.1a'
+
+# Nice text formatting options
+TEXT_BOLD='\e[1m'
+TEXT_UNSET='\e[0m'
+
+# Help message
+show_help() {
+    cat << END_OF_HELP
+$(echo -e "${TEXT_BOLD}")cwplogin:$(echo -e "${TEXT_UNSET}") Like "whmlogin" but for CWP
+
+USAGE: cwplogin
+    --help -h           Show this message
+    --version -v        Show version information
+END_OF_HELP
+}
+
+# What this function does:
+# 1. Get our current root password hash and store it
+# 2. Set a new root password and show it to the user
+# 3. Restore the original root password once we're done
+do_cwplogin() {
+    # Get the root user from the shadow file and extract their password hash
+    shadow_line="$(grep ^root: /etc/shadow)"
+    shadow_hash="$(awk -F ':' '{print $2}' <<< "${shadow_line}")"
+
+    # If for some reason this fails miserably
+    if [[ -z "${shadow_hash}" ]]; then
+        echo 'Error: Failed to extract root password hash' >&2
+        exit 1
+    fi
+
+    # Restore the original root password
+    # I don't know what to do here if this fails. Cry?
+    cleanup() {
+        if ! chpasswd -e <<< "root:${shadow_hash}"; then
+            echo 'Error: Failed to restore original root password. You might need to restore it manually.' >&2
+            echo "Password hash: ${shadow_hash}" >&2
+            exit 2
+        fi
+    }
+
+    # Run cleanup function above in case something happens
+    trap cleanup HUP INT TERM
+
+    # Generate a temporary root password and set it
+    # This originally used openssl, but believe it or not, this isn't
+    # guaranteed to be on CWP servers
+    root_password="$(head -c 15 /dev/random | base64)"
+    if ! chpasswd <<< "root:${root_password}"; then
+        echo 'Error: Failed to set temporary root password' >&2
+        exit 1
+    fi
+
+    # Return our login information
+    # This assumes a valid hostname and is up to the user to figure thigs out
+    # if one isn't set (CWP LOVES to set invalid hostnames...)
+    server_hostname="$(hostname)"
+    echo "URL: https://${server_hostname}:2087"
+    echo 'Username: root'
+    echo "Password: ${root_password}"
+
+    # We give a generous 5 minutes in case the password is needed for something
+    # other than a quick login
+    echo
+    timeout --foreground 300 read -rp 'Hit ENTER to restore original password and exit (or wait 5 minutes): '
+
+    # Run cleanup function to restore the original root password
+    cleanup
+}
+
+# Command options
+while [[ "${#}" -gt 0 ]]; do
+    case "${1}" in
+        --help | -h)
+            show_help
+            exit 0
+            ;;
+
+        --version | -v)
+            echo -e "${TEXT_BOLD}cwplogin${TEXT_UNSET} ${VERSION}"
+            exit 0
+            ;;
+
+        -*)
+            echo -e "Not sure what ${1} is supposed to mean..." >&2
+            echo
+            show_help
+            exit 1
+            ;;
+
+        *)
+            break
+            ;;
+    esac
+done
+
+# Run the do_cwplogin function. I have nothing clever to add here.
+do_cwplogin
