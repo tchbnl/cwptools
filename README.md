@@ -1,4 +1,4 @@
-I need to use CWP sometimes for work. CWP is... CWP. Here are some tools I made to make working with it a little easier.
+I need to use CWP sometimes for work. CWP is... rough. Here are some tools I made to make working with it a little easier.
 
 ## Released
 ### docroot
@@ -78,4 +78,11 @@ USAGE: switch USER
 
 ## In Development
 ### cwplogin
-Like 'whmlogin' but for CWP (as much as possible)
+Like 'whmlogin' but for CWP (as much as possible). Haven't forgotten about this one. Basic idea right now is:
+
+1. Copy the current shadow line for root
+2. Update the root password
+3. Show the new root password with a link to the CWP admin
+4. Hit enter (or Ctrl+C or w/e) to restore the original shadow line
+
+CWP doesn't have an API to create a root login session like cPanel does :(
