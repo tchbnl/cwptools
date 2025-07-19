@@ -1,4 +1,4 @@
-I need to use CWP sometimes for work reasons. CWP is bad. It is bad and the CWP developers should feel bad. So here are some tools to make it a little easier to work with.
+I need to use CWP sometimes for work. CWP is... CWP. Here are some tools I made to make working with it a little easier.
 
 ## Released
 ### docroot
@@ -55,7 +55,7 @@ USAGE: review USER
 📦 Package: default
 📅 Created: 2023-10-29 06:13:23
 📧 Email: no.email@example.com
-💾 Size: 8.0M
+💾 Home Size: 8.0M
 🌐 IP: 5.161.207.83
 📂 Doc. Root: /home/cwpsite/public_html
 [root@cwp ~]# review greg
@@ -63,7 +63,7 @@ greg wasn't found in the CWP database.
 ```
 
 ### switch
-Easily switch into a CWP user's shell account
+Like `su - user` but not. Quickly access a CWP user's shell account. Bypasses disabled shell and works around low nproc limits on accounts.
 
 ```
 [root@cwp ~]# switch
