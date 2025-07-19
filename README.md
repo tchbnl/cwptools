@@ -77,7 +77,7 @@ USAGE: switch USER
 ```
 
 ### cwplogin
-Like 'whmlogin' but for CWP (as much as possible).
+Like 'whmlogin' but for CWP (as much as possible)
 
 ```
 [root@cwp ~]# cwplogin --help
