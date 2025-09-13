@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # review: Show detailed information about a CWP account
 # Nathan P. <code@tchbnl.net>
-# 0.1e
+# 0.2a
 set -euo pipefail
 
 # This script is meant to be used by root or a user with sudo access to it
@@ -12,7 +12,7 @@ if [[ "${current_user}" != 'root' ]]; then
 fi
 
 # Version information
-VERSION='0.1e'
+VERSION='0.2a'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
@@ -29,7 +29,7 @@ USAGE: review USER
 END_OF_HELP
 }
 
-# Newer versions of MariaDB complain about using 'mysql'
+# Newer versions of MariaDB complain about using `mysql`
 if command -v mariadb >/dev/null 2>&1; then
     MYSQL_COMMAND='mariadb'
 else
@@ -80,6 +80,41 @@ review_user() {
     # The username in the database is always the Linux user, and the docroot is
     # fixed to public_html on CWP. At least as far as CWP knows.
     echo -e "📂 ${TEXT_BOLD}Doc. Root:${TEXT_UNSET} /home/${user}/public_html"
+
+    # Addon domains
+    # First check if we even have addon domains to show
+    addon_domains="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT domain FROM domains WHERE user = '${user}';")"
+
+    # And fetch them for disposal into a for loop (plus document root) if so
+    if [[ -n "${addon_domains}" ]]; then
+        echo
+        echo -e "🌎 ${TEXT_BOLD}Add-on Domains${TEXT_UNSET}"
+
+        for domain in ${addon_domains}; do
+            docroot="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT path FROM domains WHERE domain = '${domain}';")"
+
+            echo -ne "   ${domain}\t"
+            echo "${docroot}"
+        done
+    fi
+
+    # Subdomains
+    # Same deal as above
+    subdomains="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT subdomain FROM subdomains WHERE user = '${user}';")"
+
+    if [[ -n "${subdomains}" ]]; then
+        echo
+        echo -e "🌎 ${TEXT_BOLD}Subdomains${TEXT_UNSET}"
+
+        for subdomain in ${subdomains}; do
+            # CWP has the root domain in a separate column
+            domain="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT domain FROM subdomains WHERE subdomain = '${subdomain}';")"
+            docroot="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT path FROM subdomains WHERE subdomain = '${subdomain}';")"
+
+            echo -ne "   ${subdomain}.${domain}\t"
+            echo "${docroot}"
+        done
+    fi
 }
 
 # Command options
