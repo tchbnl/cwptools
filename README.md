@@ -22,7 +22,7 @@ sexylenin.com wasn't found in the CWP database.
 ```
 
 ### whoowns
-A 'whoowns' script that works like the one from cPanel
+A `whoowns` script that works like the one from cPanel
 
 ```
 [root@cwp ~]# whoowns
@@ -50,14 +50,20 @@ USAGE: review USER
     --help -h           Show this message
     --version -v        Show version information
 [root@cwp ~]# review cwpsite
-🧔 Username: cwpsite
-🌎 Domain: cwpsite.tchbnl.net
+🧔 Username: example
+🌎 Domain: example.com
 📦 Package: default
-📅 Created: 2023-10-29 06:13:23
-📧 Email: no.email@example.com
-💾 Home Size: 8.0M
-🌐 IP: 5.161.207.83
-📂 Doc. Root: /home/cwpsite/public_html
+📅 Created: 2025-07-17 16:23:33
+📧 Email: example@example.com
+💾 Home Size: 21M
+🌐 IP: 5.161.200.209
+📂 Doc. Root: /home/example/public_html
+
+🌎 Add-on Domains
+   example.net /home/example/example.net
+
+🌎 Subdomains
+   subdomain.example.com /home/example/subdomain.example.com
 [root@cwp ~]# review greg
 greg wasn't found in the CWP database.
 ```
@@ -77,7 +83,7 @@ USAGE: switch USER
 ```
 
 ### cwplogin
-Like 'whmlogin' but for CWP (as much as possible)
+Like `whmlogin` but for CWP (as much as possible)
 
 ```
 [root@cwp ~]# cwplogin --help
