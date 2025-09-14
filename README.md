@@ -49,7 +49,7 @@ review: Show detailed information about a CWP account
 USAGE: review USER
     --help -h           Show this message
     --version -v        Show version information
-[root@cwp ~]# review cwpsite
+[root@cwp ~]# review example
 🧔 Username: example
 🌎 Domain: example.com
 📦 Package: default
