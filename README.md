@@ -99,3 +99,7 @@ Password: gd+1VgjR+ILDs6NcBtS7
 
 Hit ENTER to restore original password and exit (or wait 5 minutes):
 ```
+
+## In Development
+### updatedomain (name WIP)
+Change the primary domain of a CWP account without breaking things (hopefully)
