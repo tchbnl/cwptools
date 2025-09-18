@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # review: Show detailed information about a CWP account
 # Nathan P. <code@tchbnl.net>
-# 0.2b
+# 0.2c
 set -euo pipefail
 
 # This script is meant to be used by root or a user with sudo access to it
@@ -12,7 +12,7 @@ if [[ "${current_user}" != 'root' ]]; then
 fi
 
 # Version information
-VERSION='0.2b'
+VERSION='0.2c'
 
 # Nice text formatting options
 TEXT_BOLD='\e[1m'
@@ -21,9 +21,9 @@ TEXT_UNSET='\e[0m'
 # Help message
 show_help() {
     cat << END_OF_HELP
-$(echo -e "${TEXT_BOLD}")review:$(echo -e "${TEXT_UNSET}") Show detailed information about a CWP account
+$(echo -e "${TEXT_BOLD}$(basename "${0}"):${TEXT_UNSET}") Show detailed information about a CWP account
 
-USAGE: review USER
+USAGE: $(basename "${0}") USER
     --help -h           Show this message
     --version -v        Show version information
 END_OF_HELP
@@ -93,7 +93,7 @@ review_user() {
         for domain in ${addon_domains}; do
             docroot="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT path FROM domains WHERE domain = '${domain}';")"
 
-            echo "   ${domain} ${docroot}"
+            echo -e "\t${domain} ${docroot}"
         done
     fi
 
@@ -110,7 +110,7 @@ review_user() {
             domain="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT domain FROM subdomains WHERE subdomain = '${subdomain}';")"
             docroot="$(${MYSQL_COMMAND} -u root root_cwp -Nse "SELECT path FROM subdomains WHERE subdomain = '${subdomain}';")"
 
-            echo "   ${subdomain}.${domain} ${docroot}"
+            echo -e "\t${subdomain}.${domain} ${docroot}"
         done
     fi
 }
@@ -124,7 +124,7 @@ while [[ "${#}" -gt 0 ]]; do
             ;;
 
         --version | -v)
-            echo -e "${TEXT_BOLD}review${TEXT_UNSET} ${VERSION}"
+            echo -e "${TEXT_BOLD}$(basename "${0}")${TEXT_UNSET} ${VERSION}"
             exit 0
             ;;
 
